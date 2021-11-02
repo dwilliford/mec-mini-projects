@@ -1,0 +1,176 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "id": "7d3163d0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import boto3\n",
+    "import time\n",
+    "import urllib\n",
+    "import json\n",
+    "\n",
+    "\n",
+    "\n",
+    "\n",
+    "\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "id": "017082e9",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "with open(\"../config_secret.json\") as key_file:\n",
+    "    keys = json.load(key_file)\n",
+    "\n",
+    "AWS_ACCESS_KEY_ID = keys.get('mec_transcribe_api').get('access_key_id')\n",
+    "AWS_SECRET_ACCESS_KEY = keys.get('mec_transcribe_api').get('secret_access_key')\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "id": "1e48bcb3",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "job_name = 'MEC_Transcribe_Lab'\n",
+    "job_uri = 'https://mec-transcribe-lab.s3.us-west-2.amazonaws.com/Recording.m4a'"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "id": "7aa8dc9c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "transcribe = boto3.client('transcribe', aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY, region_name='us-west-2')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "id": "c3f063eb",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "{'TranscriptionJob': {'TranscriptionJobName': 'MEC_Transcribe_Lab',\n",
+       "  'TranscriptionJobStatus': 'IN_PROGRESS',\n",
+       "  'LanguageCode': 'en-US',\n",
+       "  'MediaFormat': 'mp4',\n",
+       "  'Media': {'MediaFileUri': 'https://mec-transcribe-lab.s3.us-west-2.amazonaws.com/Recording.m4a'},\n",
+       "  'StartTime': datetime.datetime(2021, 10, 31, 17, 47, 53, 221000, tzinfo=tzlocal()),\n",
+       "  'CreationTime': datetime.datetime(2021, 10, 31, 17, 47, 53, 194000, tzinfo=tzlocal())},\n",
+       " 'ResponseMetadata': {'RequestId': 'd4b081b2-f9fc-4341-9158-e7891d994cf1',\n",
+       "  'HTTPStatusCode': 200,\n",
+       "  'HTTPHeaders': {'content-type': 'application/x-amz-json-1.1',\n",
+       "   'date': 'Mon, 01 Nov 2021 00:47:53 GMT',\n",
+       "   'x-amzn-requestid': 'd4b081b2-f9fc-4341-9158-e7891d994cf1',\n",
+       "   'content-length': '304',\n",
+       "   'connection': 'keep-alive'},\n",
+       "  'RetryAttempts': 0}}"
+      ]
+     },
+     "execution_count": 24,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "transcribe.start_transcription_job(TranscriptionJobName=job_name, Media={'MediaFileUri': job_uri}, MediaFormat='mp4', LanguageCode='en-US')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "id": "199bfce9",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{'TranscriptionJob': {'TranscriptionJobName': 'MEC_Transcribe_Lab', 'TranscriptionJobStatus': 'COMPLETED', 'LanguageCode': 'en-US', 'MediaSampleRateHertz': 48000, 'MediaFormat': 'mp4', 'Media': {'MediaFileUri': 'https://mec-transcribe-lab.s3.us-west-2.amazonaws.com/Recording.m4a'}, 'Transcript': {'TranscriptFileUri': 'https://s3.us-west-2.amazonaws.com/aws-transcribe-us-west-2-prod/619853953741/MEC_Transcribe_Lab/2928eaf8-b1ca-4b68-99b5-addc04ea87d6/asrOutput.json?X-Amz-Security-Token=IQoJb3JpZ2luX2VjEGAaCXVzLXdlc3QtMiJHMEUCIDRWee9dqLMiwPExbmg4TKnc0xQYreVX9PZqyAYUrfbAAiEAuUhCCr5A2eFUhIVugP4an6QXcoHEn%2FWMDRZHt1iaffEqgwQI%2Bf%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARADGgwwODAyNDgzMjIyMDYiDHBJxrL1FTtpmICa6CrXA9fpaNGdzrHv9Ke3Nw5C%2Brwd5hoQz6XVMtK6jFVWB85r6lxEkKab0WjaybWgowY8Xh%2BMYtpdgp7iyjr%2FCrEzBIc%2FZobGzL2V75BYzzspiNn%2BpunQmfLigUDkPHQGB1Fu5CJ8c%2BgoOACOQkQGyBieglGePZGo4p3W0VgthPJAd4lf0QKMtpEA9ptqNXVm1N8c2yPOd8V3ecBX4nQbVGLySO86mSOP9fT7%2FABGMFWr%2F%2FHB8HNffjSgezQsF9678sLcV%2Fq6tA%2B1PrELMTANH9oI0dopEPmGPqZzbaiDOAc6U2Kcx07bwhU2dejZAx9JmwHG53dvJHt95lW7yMKfudf%2BjaRX5zPAU5LUczNushCZxerSDAO7edFL0V3g0esVEx06MUzFf%2BSaK5LdziD29ob2IXbX9798PcpnoT9u73fBDgdkqOtbjbfrTa%2Bl%2Fdb2JEJ%2BEB6HCkqB%2Fze%2Bk3tVRmsjjcFKqMta6DDbh%2FzxXACcD9JARyvn7Yb9jEeO3TjQTjBQOmIilDeiDN3pD0e9CSQNkH%2F31nF2ptbDONaS6kN9M6jJlRsgp6TZXyK8NUJjjIxMpSaTcCDLkRBhelUkxAJ1JvyKlXk6aJTTsGQT12Bjmy9F7Iyc%2Bp0mzzDSy%2FyLBjqlAc17xl3LGnya623Ox7sOvpry%2BulTZ3lGOd9%2BOstPxZcki%2FKXVg%2BgsU1KeYT%2FCa5DaAnklScVDKONmcl4Ntp7yywuCq9l6yuT8dJYyCnQMQAcnwUsAUQUFlKZjcpvuwaY7KTYFZSyZnf6SGIgzxY1gxt452bGhxNfW%2BMbOy7WdZ8FOhThOM88Yo98yLHK1%2BKwlxEGI3sWnyVchbBFvXLWZjanm1LfSg%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20211101T004848Z&X-Amz-SignedHeaders=host&X-Amz-Expires=899&X-Amz-Credential=ASIARFLZMHCPLAR3VHM7%2F20211101%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Signature=9cae85858acbd0d01de87403a8c77d2d3678baf7776d0738fdc08510160beb16'}, 'StartTime': datetime.datetime(2021, 10, 31, 17, 47, 53, 221000, tzinfo=tzlocal()), 'CreationTime': datetime.datetime(2021, 10, 31, 17, 47, 53, 194000, tzinfo=tzlocal()), 'CompletionTime': datetime.datetime(2021, 10, 31, 17, 48, 13, 651000, tzinfo=tzlocal()), 'Settings': {'ChannelIdentification': False, 'ShowAlternatives': False}}, 'ResponseMetadata': {'RequestId': 'ea01d14b-3241-4e9e-9ccf-4af1dd8880f3', 'HTTPStatusCode': 200, 'HTTPHeaders': {'content-type': 'application/x-amz-json-1.1', 'date': 'Mon, 01 Nov 2021 00:48:47 GMT', 'x-amzn-requestid': 'ea01d14b-3241-4e9e-9ccf-4af1dd8880f3', 'content-length': '2049', 'connection': 'keep-alive'}, 'RetryAttempts': 0}}\n"
+     ]
+    }
+   ],
+   "source": [
+    "while True:\n",
+    "    status = transcribe.get_transcription_job(TranscriptionJobName=job_name)\n",
+    "    if status['TranscriptionJob']['TranscriptionJobStatus'] in ['COMPLETED', 'FAILED']:\n",
+    "        break\n",
+    "    print(\"Not ready yet...\")\n",
+    "    time.sleep(2)\n",
+    "print(status)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "id": "fd2fcedd",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "This is a test of amazon AWS transcribe.\n"
+     ]
+    }
+   ],
+   "source": [
+    "if status['TranscriptionJob']['TranscriptionJobStatus'] == 'COMPLETED':\n",
+    "    response = urllib.request.urlopen(status['TranscriptionJob']['Transcript']['TranscriptFileUri'])\n",
+    "    data = json.loads(response.read())\n",
+    "    text = data['results']['transcripts'][0]['transcript']\n",
+    "    print(text)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "d6d3ef3c",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "fb089b2b",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.8"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
