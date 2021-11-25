@@ -17,3 +17,7 @@ Thumbs.db
 
 # API keys
 config_secret.json
+
+# 2 large log files
+access_log_Aug95.txt
+access_log_Jul95.txt

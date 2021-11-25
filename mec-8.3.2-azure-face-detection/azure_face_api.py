@@ -2,13 +2,15 @@ import http.client, urllib.request, urllib.parse, urllib.error, base64
 
 headers = {
     # Request headers
+    # Use this content type when passing url parm instead of binary image
     'Content-Type': 'application/json',
+    # Use below for passing image but didn't get it working
     #'Content-Type': 'application/octet-stream',
     #'Ocp-Apim-Subscription-Key': '{subscription key}',
     'Ocp-Apim-Subscription-Key': '37fc98749e224c70ba3f0fb7aac3f14a',
 }
 
-print(headers)
+#print(headers)
 
 attributes = \
     "age,gender,headpose,smile," + \
@@ -18,17 +20,9 @@ attributes = \
 
 #,qualityforrecognition
 
-#attributes = "\'age,gender,headpose,smile\'"
-
-# THIS DOES NOT WORK
-#attributes = "{\'age\',\'gender\',\'headpose\',\'smile\'}"
-
 #THIS WORKS
 #attributes = "hair"
-
-#attributes = "hair,age,gender"
-
-print(attributes)
+#print(attributes)
 
 params = urllib.parse.urlencode({
     # Request parameters
